@@ -13,7 +13,7 @@ export default class Drag {
     drawPile = undefined;
     root = undefined;
     static e = undefined;
-    static xPositions = [];
+    //static xPositions = [];
     static setRoot(root) {
         this.root = root;
         PileToSlot.setRoot(root);
@@ -47,7 +47,10 @@ export default class Drag {
         
         for (let i = activeCardIndex; i < arr.length; i++) {
                 arr[i].storePos = {x: arr[i].x, y: arr[i].y};
-                if (!Vars.animate) arr[i].x = 0;
+                if (!Vars.animate) {
+                    arr[i].x = 0;
+                    arr[i].xPositions = [];
+                }
                 arr[i].rotation = 0;
                 arr[i].y = yOffset * 40;
                 this.dragCont.addChild(arr[i]);
@@ -61,7 +64,7 @@ export default class Drag {
 
     }
     static onDragEnd (e) {
-        this.xPositions = [];
+       
         if (!this.activeCard) return;
 
         let activeCardObj = Vars.globalObject(this.activeCard),
@@ -95,6 +98,8 @@ export default class Drag {
     }
     static sendCardsBackWithAnimation (e, tempArray) {
         tempArray.forEach( card => {
+            card.xPositions = [];
+            card.yPositions = [];
             card.pivot.x = card.pivot.y = 0;
             let tempX = e.data.global.x - this.root.gameBoard.x,
                 tempY = e.data.global.y - this.root.gameBoard.y;
@@ -151,39 +156,53 @@ export default class Drag {
             let i, cardA, cardB;
             arr[0].x = newPosition.x;
             arr[0].y = newPosition.y;
-            this.xPositions.push(arr[0].x)
-           this.moveCard(arr[0], newPosition, 0);
+            arr[0].xPositions.push(arr[0].x)
+            arr[0].yPositions.push(arr[0].y)
+           this.moveCard(arr[0], 0);
             console.log(this.xPositions)
             let yOffset = 1;
             for (i = 1; i < arr.length; i++) {
                 cardA = arr[i-1];
                 cardB = arr[i];
+               // cardA.xPositions.push(cardA.x)
+                cardB.xPositions.push(cardB.x)
+                cardB.yPositions.push(cardB.y)
                 cardB.pivot.x = cardA.pivot.x;
                 let yVal = yOffset * 10;
-                this.moveCard(cardB, cardA, yVal);
+                this.moveCard(cardB, yVal);
                 yOffset ++;
             };
         }
     }
-    static moveCard (card, priorCard, yValAdjust) {
-        var tempBallBody = card;
-        let last = this.xPositions[this.xPositions.length - 1];
-        let next = 
-        (this.xPositions.length > 10) ? 
-        this.xPositions[this.xPositions.length - 10] : 
-        this.xPositions[this.xPositions.length - 1];
+    static moveCard (card, yValAdjust) {
+  
+        let lastX = card.xPositions[card.xPositions.length - 1];
+        let nextX = 
+            (card.xPositions.length > 10) ? 
+            card.xPositions[card.xPositions.length - 5] : 
+            card.xPositions[card.xPositions.length - 1];
 
-        if(this.xPositions.length > 20) {
-            this.xPositions = this.xPositions.slice(-15);
+        let lastY = card.yPositions[card.yPositions.length - 1];
+        let nextY = 
+            (card.yPositions.length > 10) ? 
+            card.yPositions[card.yPositions.length - 5] : 
+            card.yPositions[card.yPositions.length - 1];
+
+        if(card.xPositions.length > 20) {
+            card.xPositions = card.xPositions.slice(-15);
+            card.yPositions = card.yPositions.slice(-15);
         }
-        card.vx += (priorCard.x - tempBallBody.x) * 0.1;
-        card.vy += (priorCard.y - tempBallBody.y) * 0.1;
+        card.vx += (lastX - nextX) * 0.1;
+        card.vy += (lastY - nextY) * 0.1;
         card.vy += 2.5;
         card.vx *= 0.8;
         card.vy *= 0.8;
-        tempBallBody.x += card.vx;
-        tempBallBody.y += (card.vy + yValAdjust);
-        let deg = Utils.deg2rad(((last - next) * 0.1))
+        if(yValAdjust !== 0){
+            console.log(card.xPositions)
+        }
+        card.x += card.vx;
+        card.y += card.vy + yValAdjust;
+        let deg = Utils.deg2rad((lastX - nextX) * 0.1)
         card.rotation = deg;
 
     }

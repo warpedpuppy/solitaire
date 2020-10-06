@@ -12,6 +12,7 @@ export default class Card extends PIXI.Container {
     vx = 0;
     vy = 0;
     xPositions = [];
+    yPositions = [];
     constructor(rank, suitIndex) {
         super();
         this.rank = rank + 1;
