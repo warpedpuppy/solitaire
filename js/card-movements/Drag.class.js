@@ -13,6 +13,7 @@ export default class Drag {
     drawPile = undefined;
     root = undefined;
     static e = undefined;
+    static xPositions = [];
     static setRoot(root) {
         this.root = root;
         PileToSlot.setRoot(root);
@@ -33,7 +34,7 @@ export default class Drag {
             let lp = e.data.getLocalPosition(this.activeCard)
             this.activeCard.pivot.x = lp.x;
             this.activeCard.pivot.y = lp.y;
-            this.dragCont.x = this.dragCont.y =  0;
+            this.dragCont.x = this.dragCont.y = 0;
         } else {
             this.dragCont.x = globalPoint.x;
             this.dragCont.y = globalPoint.y;
@@ -60,7 +61,7 @@ export default class Drag {
 
     }
     static onDragEnd (e) {
-
+        this.xPositions = [];
         if (!this.activeCard) return;
 
         let activeCardObj = Vars.globalObject(this.activeCard),
@@ -120,7 +121,7 @@ export default class Drag {
             const newPosition = e.data.getLocalPosition(this.dragCont.parent);
             this.dragCont.x = newPosition.x - this.dragCont.adjustX;
             this.dragCont.y = newPosition.y - this.dragCont.adjustY;
-        } else {
+        } else if (this.activeCard) {
             this.e = e;
         }
     }
@@ -137,22 +138,22 @@ export default class Drag {
         item.hasDrag = true;
     }
     static animate () {
-        let e = this.e;
-        if (this.activeCard) {
+        
+        if (this.activeCard && this.e) {
+            let e = this.e;
             const newPosition = e.data.getLocalPosition(this.root.app.stage);
-            this.dragCont.x = this.dragCont.y = 0;
+         
             let arr = this.dragCont.children;
             
-            let posObject = {
-                x: newPosition.x, 
-                y: newPosition.y
-            }
+        
 
-            this.moveCard(arr[0], posObject, 0);
+             
             let i, cardA, cardB;
             arr[0].x = newPosition.x;
             arr[0].y = newPosition.y;
-           // console.log(newPosition.x, arr[0].storePos.x)
+            this.xPositions.push(arr[0].x)
+           this.moveCard(arr[0], newPosition, 0);
+            console.log(this.xPositions)
             let yOffset = 1;
             for (i = 1; i < arr.length; i++) {
                 cardA = arr[i-1];
@@ -166,6 +167,15 @@ export default class Drag {
     }
     static moveCard (card, priorCard, yValAdjust) {
         var tempBallBody = card;
+        let last = this.xPositions[this.xPositions.length - 1];
+        let next = 
+        (this.xPositions.length > 10) ? 
+        this.xPositions[this.xPositions.length - 10] : 
+        this.xPositions[this.xPositions.length - 1];
+
+        if(this.xPositions.length > 20) {
+            this.xPositions = this.xPositions.slice(-15);
+        }
         card.vx += (priorCard.x - tempBallBody.x) * 0.1;
         card.vy += (priorCard.y - tempBallBody.y) * 0.1;
         card.vy += 2.5;
@@ -173,8 +183,8 @@ export default class Drag {
         card.vy *= 0.8;
         tempBallBody.x += card.vx;
         tempBallBody.y += (card.vy + yValAdjust);
-        let deg = Utils.deg2rad(card.vx);
-        console.log(deg, priorCard.x, tempBallBody.x)
-        if (Math.abs(priorCard.x - tempBallBody.x) < 10) card.rotation = (deg * 2);
+        let deg = Utils.deg2rad(((last - next) * 0.1))
+        card.rotation = deg;
+
     }
 }
