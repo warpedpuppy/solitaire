@@ -164,8 +164,8 @@ export default class Drag {
 
             arr[0].x = newPosition.x;
             arr[0].y = newPosition.y;
-        
-           this.rotateCard(arr[0], 0);
+            arr[0]
+           this.rotateCard(, 0);
             let yOffset = 1;
             for (i = 1; i < arr.length; i++) {
                 cardB = arr[i];
