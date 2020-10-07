@@ -11,8 +11,7 @@ export default class Card extends PIXI.Container {
     storeParent = undefined;
     vx = 0;
     vy = 0;
-    xPositions = [];
-    yPositions = [];
+
     constructor(rank, suitIndex) {
         super();
         this.rank = rank + 1;
@@ -20,8 +19,8 @@ export default class Card extends PIXI.Container {
         this.color = (this.suit === 'hearts' || this.suit === 'diamonds') ? "red" : "black" ;
         this.buildCard(rank, suitIndex);
         this.reveal(false);
-        // this.pivot.x = Vars.cardWidth / 2;
-        // this.pivot.y = Vars.cardHeight / 2;
+        this.pivot.x = 0;
+        this.pivot.y = 0;
     }
     setDestination (x,y) {
         this.dest = {x, y};
