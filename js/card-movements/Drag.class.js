@@ -14,7 +14,6 @@ export default class Drag {
     root = undefined;
     static e = undefined;
     static xPositions = [];
-    static yPositions = [];
     static setRoot(root) {
         this.root = root;
         PileToSlot.setRoot(root);
@@ -25,8 +24,7 @@ export default class Drag {
         this.activeCard = e.target;
 
         const newPosition = e.data.getLocalPosition(this.root.app.stage);
-        // this.activeCard.x = newPosition.x;
-        // this.activeCard.y = newPosition.y;
+       
 
         let arr = (!this.activeCard.drawPile) ? this.root.piles[this.activeCard.index] : this.root.flipPile,
             globalPoint = this.activeCard.getGlobalPosition(new PIXI.Point(this.activeCard.x, this.activeCard.y)),
@@ -44,7 +42,8 @@ export default class Drag {
             this.dragCont.adjustX = Math.abs(e.data.global.x - globalPoint.x);
             this.dragCont.adjustY = Math.abs(e.data.global.y - globalPoint.y);
         }
-
+            this.activeCard.x = newPosition.x;
+            this.activeCard.y = newPosition.y;
        
         this.activeCard.storePos = {x: this.activeCard.x, y: this.activeCard.y};
         
@@ -104,10 +103,7 @@ export default class Drag {
     }
     static sendCardsBackWithAnimation (e, tempArray) {
         tempArray.forEach( card => {
-       
-            card.xPositions = [];
-            card.yPositions = [];
-            card.pivot.x = card.pivot.y = 0;
+    
             let tempX = e.data.global.x - this.root.gameBoard.x,
                 tempY = e.data.global.y - this.root.gameBoard.y;
             card.makeInteractive(false)
@@ -117,6 +113,11 @@ export default class Drag {
                     y: [tempY, card.storePos.y],
                      rotation: [card.rotation, 0]
                 }, this.onTweenComplete.bind(this, card), 'bouncePast')
+            Tweening.tween(card.pivot, Utils.randomNumberBetween(0.5, 0.95), 
+            {
+                x: [card.pivot.x, 0], 
+                y: [card.pivot.y, 0]
+            }, this.onTweenComplete.bind(this, card), 'bouncePast')
             this.root.gameBoard.addChild(card)
         })
     }
@@ -160,7 +161,6 @@ export default class Drag {
             let i, cardB;
 
             this.xPositions.push(newPosition.x);
-            this.yPositions.push(newPosition.y)
 
             arr[0].x = newPosition.x;
             arr[0].y = newPosition.y;

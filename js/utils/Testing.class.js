@@ -29,4 +29,8 @@ export default class Testing {
             console.log(`\tthe ${card.rank} of ${card.suit}`)
         })
     }
+    static printAngles(index, rotation) {
+        let deg = Math.round(rotation * 100);
+        console.log(`card at ${index} is at ${deg} degrees`)
+    }
 }
