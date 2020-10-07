@@ -157,7 +157,7 @@ export default class Drag {
 
             let arr = this.dragCont.children;
             
-            let i, cardA, cardB;
+            let i, cardB;
 
             this.xPositions.push(newPosition.x);
             this.yPositions.push(newPosition.y)
@@ -168,7 +168,6 @@ export default class Drag {
            this.rotateCard(arr[0], 0);
             let yOffset = 1;
             for (i = 1; i < arr.length; i++) {
-                cardA = arr[i-1];
                 cardB = arr[i];
                 cardB.x = newPosition.x;
                 cardB.y = newPosition.y + (i * 40);
