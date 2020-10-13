@@ -12,17 +12,17 @@ export default class Solitare {
     deck = [];
     piles = {};
     pileMarkers = [];
-    obj =  undefined;
-    resetDrawPileButton =  undefined;
-    drawPile =  [];
-    topDrawPileCard =  undefined;
+    obj = undefined;
+    resetDrawPileButton = undefined;
+    drawPile = [];
+    topDrawPileCard = undefined;
     slotCont = new PIXI.Container();
-    flipPile =  [];
-    topFlipPileCard =  undefined;
+    flipPile = [];
+    topFlipPileCard = undefined;
     gameBoard = new PIXI.Container();
     app = undefined;
     slots = [];
-    constructor (app) {
+    constructor(app) {
         this.deck = new Deck();
         this.deal();
         this.app = app;
@@ -31,19 +31,19 @@ export default class Solitare {
     deal() {
 
         this.gameBoard.removeChildren();
-        
+
         let obj = {
-            cardCounter: 0, 
-            startX: VARS.cardWidth + this.buffer_larger, 
-            startY: VARS.cardHeight + this.buffer_larger, 
-            loopingQ:  7,
-            rows:  7,
-            totalColumns:  7
+            cardCounter: 0,
+            startX: VARS.cardWidth + this.buffer_larger,
+            startY: VARS.cardHeight + this.buffer_larger,
+            loopingQ: 7,
+            rows: 7,
+            totalColumns: 7
         }
 
         this.shuffle();
-        
-       // CARD PILES
+
+        // CARD PILES
         let { adjustedStartY, adjustedCardCounter } = this.createCardPiles(obj);
 
         this.createDrawPileResetButton(adjustedStartY);
@@ -60,11 +60,11 @@ export default class Solitare {
 
     }
 
-    shuffle () {
+    shuffle() {
         this.deck = _.shuffle(this.deck);
     }
 
-    createSlots () {
+    createSlots() {
         for (let i = 0; i < 4; i++) {
             let slot = new Slot(VARS.suits[i]);
             slot.x = (VARS.cardWidth + this.slot_spacer) * i;
@@ -75,7 +75,7 @@ export default class Solitare {
         this.gameBoard.addChild(this.slotCont)
     }
 
-    createCardPiles (obj) {
+    createCardPiles(obj) {
         let { rows, loopingQ, cardCounter, startX, startY, totalColumns } = obj;
 
         for (let i = 0; i < loopingQ; i++) {
@@ -87,14 +87,14 @@ export default class Solitare {
             this.piles[i] = [marker]
         }
         let card;
-        for (let i = 0; i < rows; i ++) {
-            for (let j = 0; j < loopingQ; j ++) {
-            
+        for (let i = 0; i < rows; i++) {
+            for (let j = 0; j < loopingQ; j++) {
+
                 card = this.deck[cardCounter];
                 card.x = startX + (VARS.cardWidth + this.buffer) * j;
                 card.y = startY + (this.buffer * i);
                 this.gameBoard.addChild(card);
-                cardCounter ++;
+                cardCounter++;
 
                 //index is the key in the object for the piles of cards.  the values will be arrays of the cards in that pile
                 let index = (totalColumns - loopingQ) + j;
@@ -103,22 +103,22 @@ export default class Solitare {
                 card.drawPile = false;
 
                 this.piles[index].push(card)
-                
+
                 if (j === 0) {
                     card.reveal(true);
                     card.makeInteractive(true)
                     ListenerManager.addDrag(card);
                 }
             }
-            
-            loopingQ --;
+
+            loopingQ--;
 
             startX += VARS.cardWidth + this.buffer;
         }
 
         return { adjustedCardCounter: cardCounter, adjustedStartY: startY }
     }
-    
+
     createDrawPileResetButton(startY) {
         this.resetDrawPileButton = new Marker();
         this.resetDrawPileButton.x = 0;
@@ -127,24 +127,23 @@ export default class Solitare {
         this.gameBoard.addChild(this.resetDrawPileButton);
     };
     createDrawPile(startY, arr, init) {
-       
-        let c;
-        arr.forEach( card => {
-                card.x = 0;
-                card.y = startY;
-                card.reveal(false);
-                this.gameBoard.addChild(card);
-                startY += 0.25;
-                card.isDrawPile(true);
-                if (init) this.drawPile.push(card);
-                c = card;
-            }
-        )
 
-       TESTING.printDeck(this.drawPile)
-       this.topDrawPileCard = c;
-       ListenerManager.addFlip(this.topDrawPileCard);
-     
+        let c;
+        arr.forEach(card => {
+            card.x = 0;
+            card.y = startY;
+            card.reveal(false);
+            this.gameBoard.addChild(card);
+            startY += 0.25;
+            card.isDrawPile(true);
+            if (init) this.drawPile.push(card);
+            c = card;
+        })
+
+        TESTING.printDeck(this.drawPile)
+        this.topDrawPileCard = c;
+        ListenerManager.addFlip(this.topDrawPileCard);
+
     }
     revealNextCard(arr) {
         if (arr.length) {
