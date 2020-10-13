@@ -132,18 +132,6 @@ export default class Drag {
             this.e = e;
         }
     }
-    static addDrag(item) {
-
-        if (item._eventsCount > 1) return;
-        item.makeInteractive(true)
-        item
-            .on('pointerdown', this.onDragStart.bind(this))
-            .on('pointerup', this.onDragEnd.bind(this))
-            .on('pointerupoutside', this.onDragEnd.bind(this))
-            .on('pointermove', this.onDragMove.bind(this))
-
-        item.hasDrag = true;
-    }
     static animate() {
 
         if (this.activeCard && this.e) {

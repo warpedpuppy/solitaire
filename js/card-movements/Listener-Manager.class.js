@@ -6,32 +6,39 @@ export default class ListenerManager {
 
     static root = undefined;
 
-    static setRoot (root) {
+    static setRoot(root) {
         this.root = root;
         Drag.setRoot(root);
         DrawPileListeners.setRoot(root);
     }
 
-    static removeAllListeners (item) {
+    static removeAllListeners(item) {
         item.makeInteractive(false);
         item.removeAllListeners();
     }
-    static addDrag (card) {
-        Drag.addDrag(card)
-       
-    }
-    static addFlip (card) {
+    static addDrag(card) {
+
+        if (card._eventsCount > 1) return;
         card.makeInteractive(true)
-        card.on("click", DrawPileListeners.drawPileClickHandler.bind(DrawPileListeners));
-        
+        card
+            .on('pointerdown', Drag.onDragStart.bind(Drag))
+            .on('pointerup', Drag.onDragEnd.bind(Drag))
+            .on('pointerupoutside', Drag.onDragEnd.bind(Drag))
+            .on('pointermove', Drag.onDragMove.bind(Drag))
+
     }
-    static addResetFlip (button) {
+    static addFlip(card) {
+        card.makeInteractive(true)
+        card.on("pointerup", DrawPileListeners.drawPileClickHandler.bind(DrawPileListeners));
+
+    }
+    static addResetFlip(button) {
         button.visible = true;
         button.interactive = button.buttonMode = true;
-        button.on("click", DrawPileListeners.resetDrawPileHandler.bind(DrawPileListeners))
-       
+        button.on("pointerup", DrawPileListeners.resetDrawPileHandler.bind(DrawPileListeners))
+
     }
-    static removeResetFlip (button) {
+    static removeResetFlip(button) {
         button.visible = false;
         button.interactive = false;
         button.buttonMode = false;
