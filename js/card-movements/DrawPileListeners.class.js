@@ -5,18 +5,20 @@ import Tweening from '../utils/Tweening.class.js';
 
 export default class {
     root = undefined;
-    static setRoot (root) {
+    static setRoot(root) {
         this.root = root;
     }
-    static drawPileClickHandler (e) {
+    static drawPileClickHandler(e) {
 
 
-        let top3 = this.root.drawPile.splice(-3).reverse(), 
+        let top3 = this.root.drawPile.splice(-3).reverse(),
             card;
+
+        if (this.root.topFlipPileCard) ListenerManager.removeAllListeners(this.root.topFlipPileCard)
 
         Testing.printDeck(top3)
 
-        for (let i = 0; i < top3.length; i ++) {
+        for (let i = 0; i < top3.length; i++) {
             card = top3[i];
             card.reveal(true);
             ListenerManager.removeAllListeners(card);
@@ -27,39 +29,58 @@ export default class {
             } else {
                 let newY = card.y + Vars.cardHeight + 50;
                 card.makeInteractive(false);
-                let timing = 0.5 * (0.5 * (i+1))
-                console.log(card, timing, card.y, newY);
-                Tweening.tween(card, timing, {y: [card.y, newY]}, this.completeMove.bind(card, i), 'bounce')
+                let timing = 0.5 * (0.5 * (i + 1))
+                Tweening.tween(card, timing, { y: [card.y, newY] }, this.completeMove.bind(card, i), 'bounce')
             }
-            
+
         }
 
         this.root.flipPile = [...this.root.flipPile, ...top3];
+        Testing.printDeck(this.root.flipPile)
         this.root.topFlipPileCard = card;
         ListenerManager.addDrag(this.root.topFlipPileCard);
         if (this.root.drawPile.length === 0) {
-            
-            ListenerManager.addResetFlip(this.root.resetDrawPileButton); 
+
+            ListenerManager.addResetFlip(this.root.resetDrawPileButton);
         } else {
             let topCard = this.root.drawPile[this.root.drawPile.length - 1];
             ListenerManager.addFlip(topCard);
         }
 
-       Testing.howManyListeners(this.root.flipPile);
-    
+
+
     }
-    static completeMove (card, i) {
-        console.log("COMPLETE")
-        if (i === 0)card.makeInteractive(true)
+    static completeMove(card, i) {
+        if (i === 0) card.makeInteractive(true)
     }
-    static resetDrawPileHandler (e) {
+    static resetDrawPileHandler(e) {
 
         ListenerManager.removeResetFlip(this.root.resetDrawPileButton);
         this.root.drawPile = [...this.root.flipPile].reverse();
-        let startY = Vars.cardHeight + (this.root.buffer * 4), c;
+        let startY = Vars.cardHeight + (this.root.buffer * 4),
+            c;
         this.root.createDrawPile(startY, this.root.drawPile, false);
         this.root.flipPile = [];
     }
+    static revealNextCard(arr) {
 
+        if (arr.length) {
+            let finalIndex = arr.length - 1;
+            let newTopCard = arr[finalIndex];
+
+
+            console.log("new flip pile top card is ", newTopCard.suit, newTopCard.rank)
+            newTopCard = this.topDrawPileCard;
+
+
+
+            newTopCard.reveal(true);
+
+            ListenerManager.addDrag(newTopCard);
+
+            Testing.howManyListeners(this.root.flipPile);
+
+        }
+    };
 
 }

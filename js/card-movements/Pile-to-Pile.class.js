@@ -5,59 +5,60 @@ import Vars from '../utils/Vars.class.js';
 export default class PileToPile {
 
     static root = undefined;
-    static setRoot (root) {
+    static setRoot(root) {
         this.root = root;
     }
-    static movePileListener (activeCardObj, activeCard) {
+    static movePileListener(activeCardObj, activeCard) {
         this.activeCard = activeCard;
         for (let key in this.root.piles) {
-            
-          let arr = this.root.piles[key],
-              topCard = arr[arr.length - 1];
-          
-          if (!this.activeCard || !topCard || activeCard.index === key) continue;
 
-          let topCardObj = Vars.globalObject(topCard); 
+            let arr = this.root.piles[key],
+                topCard = arr[arr.length - 1];
 
-          let alternatingSuitAndOneLower = (topCard.color !== activeCard.color && topCard.rank === (activeCard.rank + 1));
+            if (!this.activeCard || !topCard || activeCard.index === key) continue;
 
-           if ( 
-               (alternatingSuitAndOneLower || topCard.marker) &&
-               Utils.rectangleRectangleCollisionDetection(topCardObj, activeCardObj)
-           ) {
-               return {hit: true, topCard, key}
-           } 
-         
-       }
-       return { hit: false }
-   }
-   static movePiles (topCard, key) {
-       
-       let temp = [...Drag.dragCont.children], 
-           arr;
-       temp.forEach ( (card, i) => {
+            let topCardObj = Vars.globalObject(topCard);
 
-           card.x = topCard.x;
-           card.pivot.set(0)
-           let yAdjust = (topCard.marker) ? 
-            ( i * this.root.buffer_larger ) : 
-            ((i + 1) * this.root.buffer_larger ) ;
+            let alternatingSuitAndOneLower = (topCard.color !== activeCard.color && topCard.rank === (activeCard.rank + 1));
 
-           card.y = topCard.y + yAdjust;
+            if (
+                (alternatingSuitAndOneLower || topCard.marker) &&
+                Utils.rectangleRectangleCollisionDetection(topCardObj, activeCardObj)
+            ) {
+                return { hit: true, topCard, key }
+            }
 
-           if (!card.drawPile) {
-             this.root.piles[card.index].splice(this.root.piles[card.index].indexOf(card), 1)
-             arr = this.root.piles[card.index];
-           } else {
-               card.drawPile = false;
-               this.root.flipPile.splice(this.root.flipPile.indexOf(card), 1);
-               arr = this.root.flipPile;
-           }
-           
-           this.root.piles[key].push(card);
-           this.root.gameBoard.addChild(card);
-           card.index = key;
-       })
-       this.root.revealNextCard(arr)
-   }
+        }
+        return { hit: false }
+    }
+    static movePiles(topCard, key) {
+
+        let temp = [...Drag.dragCont.children];
+
+        temp.forEach((card, i) => {
+
+            card.x = topCard.x;
+            card.pivot.set(0)
+            let yAdjust = (topCard.marker) ?
+                (i * this.root.buffer_larger) :
+                ((i + 1) * this.root.buffer_larger);
+
+            card.y = topCard.y + yAdjust;
+
+            if (!card.drawPile) {
+                this.root.piles[card.index].splice(this.root.piles[card.index].indexOf(card), 1)
+
+                this.root.revealNextCard(this.root.piles[card.index])
+            } else {
+                card.drawPile = false;
+                this.root.flipPile.splice(this.root.flipPile.indexOf(card), 1);
+                this.root.revealNextCard(this.root.flipPile)
+            }
+
+            this.root.piles[key].push(card);
+            this.root.gameBoard.addChild(card);
+            card.index = key;
+        })
+
+    }
 }

@@ -130,6 +130,7 @@ export default class Solitare {
 
         let c;
         arr.forEach(card => {
+            ListenerManager.removeAllListeners(card)
             card.x = 0;
             card.y = startY;
             card.reveal(false);
@@ -149,7 +150,12 @@ export default class Solitare {
         if (arr.length) {
             let finalIndex = arr.length - 1;
             let newTopCard = arr[finalIndex];
-            //console.log("add listener to ", newTopCard.suit, newTopCard.rank)
+
+            if (arr === this.flipPile) {
+                console.log("new flip pile top card is ", newTopCard.suit, newTopCard.rank, newTopCard._eventsCount)
+                this.topDrawPileCard = newTopCard;
+            }
+
             if (!newTopCard.marker) {
                 newTopCard.reveal(true);
 

@@ -28,24 +28,27 @@ export default class Drag {
 
         let arr = (!this.activeCard.drawPile) ? this.root.piles[this.activeCard.index] : this.root.flipPile,
             globalPoint = this.activeCard.getGlobalPosition(new PIXI.Point(this.activeCard.x, this.activeCard.y)),
-            activeCardIndex = arr.indexOf(this.activeCard),
+            activeCardIndex = (!this.activeCard.drawPile) ? arr.indexOf(this.activeCard) : arr.length - 1,
             yOffset = 0;
 
-        if (Vars.animate) {
-            let lp = e.data.getLocalPosition(this.activeCard)
-            this.activeCard.pivot.x = lp.x;
-            this.activeCard.pivot.y = lp.y;
-            this.dragCont.x = this.dragCont.y = 0;
-        } else {
-            this.dragCont.x = globalPoint.x;
-            this.dragCont.y = globalPoint.y;
-            this.dragCont.adjustX = Math.abs(e.data.global.x - globalPoint.x);
-            this.dragCont.adjustY = Math.abs(e.data.global.y - globalPoint.y);
-        }
+        console.log("is draw pile = ", this.activeCard.drawPile, activeCardIndex, arr.length)
+
+        // if (Vars.animate) {
+        let lp = e.data.getLocalPosition(this.activeCard)
+        this.activeCard.pivot.x = lp.x;
+        this.activeCard.pivot.y = lp.y;
+        this.dragCont.x = this.dragCont.y = 0;
+        // } else {
+        //     this.dragCont.x = globalPoint.x;
+        //     this.dragCont.y = globalPoint.y;
+        //     this.dragCont.adjustX = Math.abs(e.data.global.x - globalPoint.x);
+        //     this.dragCont.adjustY = Math.abs(e.data.global.y - globalPoint.y);
+        // }
 
         this.activeCard.storePos = { x: this.activeCard.x, y: this.activeCard.y };
 
         for (let i = activeCardIndex; i < arr.length; i++) {
+            console.log("card loop", i)
             let card = arr[i];
             card.pivot.x = this.activeCard.pivot.x;
             card.storePos = { x: card.x, y: card.y };
@@ -60,6 +63,9 @@ export default class Drag {
         this.root.app.stage.addChild(this.dragCont)
 
         Testing.beingCarried(this.dragCont.children)
+
+        Testing.howManyListeners(this.root.drawPile, "draw pile:")
+        Testing.howManyListeners(this.root.flipPile, "flip pile:")
 
     }
     static onDragEnd(e) {
@@ -109,12 +115,12 @@ export default class Drag {
             Tweening.tween(card.pivot, Utils.randomNumberBetween(0.5, 0.95), {
                 x: [card.pivot.x, 0],
                 y: [card.pivot.y, 0]
-            }, this.onTweenComplete.bind(this, card), 'bouncePast')
+            }, undefined, undefined)
             this.root.gameBoard.addChild(card)
         })
     }
     static onTweenComplete(card) {
-
+        console.log(card.suit, card.rank)
         card.makeInteractive(true)
         card.x = card.storePos.x;
         card.y = card.storePos.y;
