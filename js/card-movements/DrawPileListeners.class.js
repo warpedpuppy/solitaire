@@ -62,25 +62,5 @@ export default class {
         this.root.createDrawPile(startY, this.root.drawPile, false);
         this.root.flipPile = [];
     }
-    static revealNextCard(arr) {
-
-        if (arr.length) {
-            let finalIndex = arr.length - 1;
-            let newTopCard = arr[finalIndex];
-
-
-            console.log("new flip pile top card is ", newTopCard.suit, newTopCard.rank)
-            newTopCard = this.topDrawPileCard;
-
-
-
-            newTopCard.reveal(true);
-
-            ListenerManager.addDrag(newTopCard);
-
-            Testing.howManyListeners(this.root.flipPile);
-
-        }
-    };
 
 }

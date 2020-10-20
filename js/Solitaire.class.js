@@ -152,13 +152,11 @@ export default class Solitare {
             let newTopCard = arr[finalIndex];
 
             if (arr === this.flipPile) {
-                console.log("new flip pile top card is ", newTopCard.suit, newTopCard.rank, newTopCard._eventsCount)
                 this.topDrawPileCard = newTopCard;
             }
 
             if (!newTopCard.marker) {
                 newTopCard.reveal(true);
-
                 ListenerManager.addDrag(newTopCard);
             }
         }
